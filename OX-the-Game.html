@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>OX-the-Game</title>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="text/babel">
+        // 需要 棋盤(Board) OX(Cell) WINNER LINE(Line)
+        class Board extends React.Component{
+            constructor(props){
+                super(props);                
+                // Round 回合數    BoardMark 棋盤狀態                
+                this.state = {                    
+                    round : 0,                    
+                    BoardMark : [-1,-1,-1,-1,-1,-1,-1,-1,-1],
+                    winner : null
+                };
+            }            
+
+            render(){
+                let cells = [];
+                
+                for(let i=0;i<this.state.BoardMark.length;i++){
+					// 利用屬性傳遞框框的編號 (index)，框框的標記 (mark) 和更新的回呼函式 (update) 給 Cell 組件
+					cells.push(
+                        <Cell index={i} 
+                              mark={this.state.BoardMark[i]}
+						      update={this.updateMark.bind(this)} />);
+				}
+				return <div className="board">{cells}</div>;
+            }
+
+            updateMark(index){
+				this.setState((preState)=>{
+					let currentMark= preState.BoardMark[index];
+					if(currentMark === -1 && preState.winner === null){
+						let mark = preState.round%2;                     // 根據回合數，決定要畫圈或叉
+						preState.BoardMark[index]=mark;                  // 把圈或叉的標記，記錄到 BoardMark 裡面
+						let winner=this.checkWinner(preState.BoardMark); // 偵測贏家
+						return {
+							round: preState.round+1 ,
+							BoardMark:preState.BoardMark,
+							winner:winner
+						};
+					}
+				});
+			}
+            checkWinner(BoardMark){				
+				// 水平方向的三條線是否有相同的標記
+				let index;
+				for(let y=0;y<3;y++){
+					if(BoardMark[y*3]!==-1 && BoardMark[y*3]===BoardMark[y*3+1] && BoardMark[y*3+1]===BoardMark[y*3+2]){
+						return {
+                            side:BoardMark[y*3],
+                             startIndex:y*3,
+                              endIndex:y*3+2
+                              };
+					}
+				}
+				// 垂直方向的三條線是否有相同的標記
+				for(let x=0;x<3;x++){
+					if(BoardMark[x]!==-1 && BoardMark[x]===BoardMark[3+x] && BoardMark[3+x]===BoardMark[2*3+x]){
+						return {
+                            side:BoardMark[x], 
+                            startIndex:x, 
+                            endIndex:2*3+x
+                            };
+					}
+				}
+				// 斜線方向的兩條線是否有相同的標記
+				if(BoardMark[0]!==-1 && BoardMark[0]===BoardMark[4] && BoardMark[4]===BoardMark[8]){
+					return {
+                        side:BoardMark[0], 
+                        startIndex:0, 
+                        endIndex:8
+                        };
+				}else if(BoardMark[2]!==-1 && BoardMark[2]===BoardMark[4] && BoardMark[4]===BoardMark[6]){
+					return {
+                        side:BoardMark[2], 
+                        startIndex:2, 
+                        endIndex:6
+                        };
+				}
+				// 目前還沒有贏家
+				return null;
+			}
+        }
+
+        class Cell extends React.Component{
+            render(){
+                //  0 表示 O  , 1 表示 X
+                switch (this.props.mark) {
+                    case 0:
+                    text = 'O';
+                        break;
+                    case 1:
+                    text = 'X';
+                        break;
+                }
+                
+                return <div className='cell' onClick={ this.click.bind(this) }>{text}</div>
+            }
+
+            click(){
+                this.props.update(this.props.index);
+            }
+        }
+
+        class Line extends React.Component{            
+            render(){
+
+            }
+        }
+
+        window.addEventListener('load',()=>{            
+            ReactDOM.render(
+                <Board/> , document.body
+            );
+        });
+    </script>
+    <link rel=stylesheet type="text/css" href="./css/game.css">
+</head>
+
+<body>
+</body>
+
+</html>
