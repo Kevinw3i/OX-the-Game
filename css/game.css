@@ -1,3 +1,10 @@
+.game{
+    margin:25px auto;
+    padding: 0px;
+    width:auto;
+    height:auto;
+}
+
 .board{
     width:300px;
     height:300px;
@@ -5,6 +12,29 @@
     border:5px solid #000000;
     border-radius:10px;
     position:relative;
+}
+
+.scoreboard{
+    position:relative;
+    margin:50px auto;
+    color: blue;
+    width:250px;
+    height:250px;
+}
+
+.restartbutton{
+    border: 2px blue solid;
+    border-radius:10px;
+    text-align:center;
+    line-height:25px;
+    cursor: pointer;
+    width:50px;
+    height:30px;
+}
+
+.restartbutton>.button{
+    color: red;
+    cursor: pointer;
 }
 
 .board>.cell{
@@ -27,3 +57,5 @@
     width:300px;
     height:300px;
 }        
+
+

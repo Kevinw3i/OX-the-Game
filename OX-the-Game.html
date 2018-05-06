@@ -14,11 +14,14 @@
         class Board extends React.Component{
             constructor(props){
                 super(props);                
-                // Round 回合數    BoardMark 棋盤狀態                
+                // Round 回合數    BoardMark 棋盤狀態        
+                // winnerStatus 獲勝次數        
                 this.state = {                    
                     round : 0,                    
                     BoardMark : [-1,-1,-1,-1,-1,-1,-1,-1,-1],
-                    winner : null
+                    winner : null ,
+                    winnerStatus : [0,0],
+                    totalRound : 0             
                 };
             }            
 
@@ -33,13 +36,37 @@
 						      update={this.updateMark.bind(this)} />);
 				}
 
-                if(this.state.winner!==null){
+                if(this.state.winner !== null){
 					// 利用屬性傳遞線段的開頭框框編號 (startIndex) 和結束框框標號 (endIndex) 給 Line 組件
 					cells.push(<Line startIndex={this.state.winner.startIndex}
-						endIndex={this.state.winner.endIndex} />);
+						endIndex={this.state.winner.endIndex} />);                    
 				}
 
-				return <div className="board">{cells}</div>;
+				return <div className='game'>
+                <div className="board">{cells}</div>
+                <div className='scoreboard'>
+                    <div>回合數: {this.state.totalRound}</div>
+                    <div>比分: <br/> O [{this.state.winnerStatus[0]}] X [{this.state.winnerStatus[1]}]</div>
+                    <div>
+                    <br/>
+                    </div>                    
+                    <div className='restartbutton' id='restartbutton'>
+                        <div className='button' onClick={this.resetgame.bind(this)}>Again</div>
+                    </div>
+                </div>
+                </div>;
+            }
+
+            resetgame(){
+                this.setState((preState)=>{       
+                    return  {             
+                        round : 0,                    
+                        BoardMark : [-1,-1,-1,-1,-1,-1,-1,-1,-1],
+                        winner : null ,
+                        winnerStatus : preState.winnerStatus,
+                        totalRound : 0   
+                    }                 
+                })                
             }
 
             updateMark(index){
@@ -48,11 +75,25 @@
 					if(currentMark === -1 && preState.winner === null){
 						let mark = preState.round%2;                     // 根據回合數，決定要畫圈或叉
 						preState.BoardMark[index]=mark;                  // 把圈或叉的標記，記錄到 BoardMark 裡面
-						let winner=this.checkWinner(preState.BoardMark); // 偵測贏家
+						let winner=this.checkWinner(preState.BoardMark); // 偵測贏家 
+                        
+                        if(winner !== null)
+                        {
+                            preState.totalRound = preState.totalRound + 1;
+                            if(winner.side ===0){
+                                preState.winnerStatus[0] = preState.winnerStatus[0] + 1;
+                            }
+                            else{
+                                preState.winnerStatus[1] = preState.winnerStatus[1] + 1;
+                            }
+                        }
+
 						return {
 							round: preState.round+1 ,
 							BoardMark:preState.BoardMark,
-							winner:winner
+							winner:winner,
+                            winnerStatus : preState.winnerStatus,
+                            totalRound : preState.totalRound
 						};
 					}
 				});
@@ -129,11 +170,19 @@
 
         class Line extends React.Component{            
             render(){
-                let startX=this.props.startIndex%3;
+                let startX=this.props.startIndex %3;
 				let startY=Math.floor(this.props.startIndex/3);
 				let endX=this.props.endIndex%3;
 				let endY=Math.floor(this.props.endIndex/3);
-				return <svg className="line"><line x1={startX*100+50} y1={startY*100+50} x2={endX*100+50} y2={endY*100+50} stroke="red" strokeWidth="5" /></svg>;
+				return <svg className="line">
+                <line 
+                x1={startX*100+50} 
+                y1={startY*100+50} 
+                x2={endX*100+50} 
+                y2={endY*100+50} 
+                stroke="red" 
+                strokeWidth="5" />
+                </svg>;
             }
         }
 
@@ -145,8 +194,6 @@
     </script>
     <link rel=stylesheet type="text/css" href="./css/game.css">
 </head>
-
 <body>
 </body>
-
 </html>
