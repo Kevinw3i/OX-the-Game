@@ -51,7 +51,10 @@
                     <br/>
                     </div>                    
                     <div className='restartbutton' id='restartbutton'>
-                        <div className='button' onClick={this.resetgame.bind(this)}>Again</div>
+                        <div className='button' onClick={this.resetgame.bind(this)}>Again</div> 
+                    </div>
+                    <div className='restartbutton' id='restartbutton'>
+                        <div className='button' onClick={this.restartgame.bind(this)}>Reset</div>
                     </div>
                 </div>
                 </div>;
@@ -67,6 +70,18 @@
                         totalRound : 0   
                     }                 
                 })                
+            }
+
+            restartgame(){
+                this.setState((preState)=>{       
+                    return  {             
+                        round : 0,                    
+                        BoardMark : [-1,-1,-1,-1,-1,-1,-1,-1,-1],
+                        winner : null ,
+                        winnerStatus : [0,0],
+                        totalRound : 0       
+                    }                 
+                })   
             }
 
             updateMark(index){
